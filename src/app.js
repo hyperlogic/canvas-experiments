@@ -1,7 +1,8 @@
-define(["color", "matrix2d"], function (colorModule, matrix2dModule) {
+define(["color", "matrix2d", "node"], function (colorModule, matrix2dModule, nodeModule) {
 
     var Color = colorModule.Color;
     var Matrix2D = matrix2dModule.Matrix2D;
+	var Node = nodeModule.Node;
 
     var App = function (title, canvasId) {
         this.title = title;
@@ -10,7 +11,21 @@ define(["color", "matrix2d"], function (colorModule, matrix2dModule) {
         this.height = canvas.height;
         this.ctx = canvas.getContext("2d");
         this.t = 0;
-        this.backgroundColor = new Color(1, 1, 1, 1);
+        this.backgroundColor = new Color(0.3, 0.3, 0.3, 1);
+
+		this.nodes = [];
+		this.nodes[0] = new Node();
+		this.nodes[0].position = [100, 100];
+		this.nodes[0].size = [10, 10];
+		this.nodes[0].rotation = 45;
+		this.nodes[0].anchor = [0.5, 0.5];
+		this.nodes[0].skew = [0, 0];
+		this.nodes[0].color = new Color(0, 0, 0, 1);
+
+		this.nodes[1] = new Node();
+		this.nodes[1].position = [100, 100];
+		this.nodes[1].size = [1, 1];
+		this.nodes[1].color = new Color(0, 1, 0, 1);
 
         // hook up rendering loop
         var FPS = 30;
@@ -33,20 +48,11 @@ define(["color", "matrix2d"], function (colorModule, matrix2dModule) {
 
         this.clear(this.backgroundColor);
 
-        var x = (Math.sin(this.t) * (this.width / 2)) + (this.width / 2);
+		this.nodes[0].rotation = this.t * 30;
 
-        var mat = new Matrix2D();
-        mat.setScaleRotTrans(1, 1, this.t * 30, x, 10);
-        ctx.setTransform.apply(ctx, mat.m);
-
-        ctx.fillStyle = "rgb(200,0,0)";
-        ctx.fillRect(0, 0, 55, 50);
-
-        ctx.setTransform(1, 0, 0, 1, 0, 0); // ident
-
-        x = (Math.sin(this.t * 1.5) * (this.width / 2)) + (this.width / 2);
-        ctx.fillStyle = "rgba(0, 0, 200, 0.5)";
-        ctx.fillRect (x, 30, 55, 50);
+		for (var i = 0; i < this.nodes.length; i++) {
+			this.nodes[i].draw(this.ctx);
+		}
     };
 
     return { App: App };
