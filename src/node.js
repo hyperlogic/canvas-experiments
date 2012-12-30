@@ -11,6 +11,7 @@ define(["color", "matrix2d"], function (colorModule, matrix2dModule) {
 		this._size = [0, 0];
 		this._skew = [0, 0];
 		this._color = new Color(1, 1, 1, 1);
+		this._children = [];
 		this._xformDirty = true;
 	};
 
@@ -76,6 +77,14 @@ define(["color", "matrix2d"], function (colorModule, matrix2dModule) {
 		this._color = new Color(color.r, color.g, color.b, color.a); // copy
 	});
 
+	// children attribute
+	Node.prototype.__defineGetter__("children", function () {
+		return this._children.slice(0); // copy
+	});
+	Node.prototype.__defineSetter__("children", function (children) {
+		this._children = children.slice(0); // copy
+	});
+
 	Node.prototype._updateXform = function () {
 		if (this._xformDirty) {
 			var ax = this._anchor[0] * this._size[0];
@@ -112,12 +121,21 @@ define(["color", "matrix2d"], function (colorModule, matrix2dModule) {
 		}
 	};
 
-	Node.prototype.draw = function (ctx) {
+	Node.prototype.draw = function (ctx, parentXform) {
 		this._updateXform();
-		// TODO: mult by parent xform.
-		ctx.setTransform.apply(ctx, this._xform.m);
+		var xform;
+		if (parentXform) {
+			xform = Matrix2D.multiply(parentXform, this._xform);
+		} else {
+			xform = this._xform;
+		}
+		ctx.setTransform.apply(ctx, xform.m);
         ctx.fillStyle = this.color.toString();
         ctx.fillRect(0, 0, this._size[0], this._size[1]);
+
+		for (var i = 0; i < this._children.length; i++) {
+			this._children[i].draw(ctx, xform);
+		}
 	};
 
 	return { Node: Node };

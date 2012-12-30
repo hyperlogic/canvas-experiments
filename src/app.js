@@ -11,21 +11,42 @@ define(["color", "matrix2d", "node"], function (colorModule, matrix2dModule, nod
         this.height = canvas.height;
         this.ctx = canvas.getContext("2d");
         this.t = 0;
-        this.backgroundColor = new Color(0.3, 0.3, 0.3, 1);
 
-		this.nodes = [];
-		this.nodes[0] = new Node();
-		this.nodes[0].position = [100, 100];
-		this.nodes[0].size = [10, 10];
-		this.nodes[0].rotation = 45;
-		this.nodes[0].anchor = [0.5, 0.5];
-		this.nodes[0].skew = [0, 0];
-		this.nodes[0].color = new Color(0, 0, 0, 1);
+		this.root = new Node();
+		this.root.size = [this.width, this.height];
+		this.root.color = new Color(0.4, 0.4, 0.4, 1);
 
-		this.nodes[1] = new Node();
-		this.nodes[1].position = [100, 100];
-		this.nodes[1].size = [1, 1];
-		this.nodes[1].color = new Color(0, 1, 0, 1);
+		this.black = new Node();
+
+		this.blackBox = new Node();
+		this.blackBox.position = [100, 100];
+		this.blackBox.size = [30, 50];
+		this.blackBox.rotation = 45;
+		this.blackBox.anchor = [0.5, 0.25];
+		this.blackBox.skew = [0, 0];
+		this.blackBox.color = new Color(0, 0, 0, 1);
+
+		this.greenDot = new Node();
+		this.greenDot.anchor = [0.5, 0.5]
+		this.greenDot.position = [100, 100];
+		this.greenDot.size = [1, 1];
+		this.greenDot.color = new Color(0, 1, 0, 1);
+
+		this.redDot = new Node();
+		this.redDot.position = [0, 0];
+		this.redDot.anchor = [0, 0];
+		this.redDot.size = [20, 10];
+		this.redDot.color = new Color(1, 0, 0, 1);
+
+		this.blueDot = new Node();
+		this.blueDot.position = [30, 50];
+		this.blueDot.anchor = [1, 1];
+		this.blueDot.size = [20, 10];
+		this.blueDot.color = new Color(0.7, 0.7, 1, 1);
+
+		this.blackBox.children = [this.redDot, this.blueDot];
+
+		this.root.children = [this.blackBox, this.greenDot];
 
         // hook up rendering loop
         var FPS = 30;
@@ -35,24 +56,18 @@ define(["color", "matrix2d", "node"], function (colorModule, matrix2dModule, nod
         }, 1000/FPS);
     };
 
-    App.prototype.clear = function (color) {
-        this.ctx.fillStyle = color.toString();
-        this.ctx.fillRect(0, 0, this.width, this.height);
-    };
-
     App.prototype.update = function (dt) {
         var ctx = this.ctx;
         this.t += dt;
 
         ctx.setTransform(1, 0, 0, 1, 0, 0); // ident
 
-        this.clear(this.backgroundColor);
+		this.blackBox.rotation = this.t * 60;
+		this.blackBox.anchor = [0.5, 0.5 + 0.5 * Math.sin(this.t)];
 
-		this.nodes[0].rotation = this.t * 30;
+		this.root.draw(this.ctx);
 
-		for (var i = 0; i < this.nodes.length; i++) {
-			this.nodes[i].draw(this.ctx);
-		}
+		ctx.setTransform(1, 0, 0, 1, 0, 0); // ident
     };
 
     return { App: App };
