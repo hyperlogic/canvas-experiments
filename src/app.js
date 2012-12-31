@@ -1,6 +1,5 @@
-define(["color", "matrix2d", "node"], function (colorModule, matrix2dModule, nodeModule) {
+define(["matrix2d", "node"], function (matrix2dModule, nodeModule) {
 
-    var Color = colorModule.Color;
     var Matrix2D = matrix2dModule.Matrix2D;
     var Node = nodeModule.Node;
 
@@ -14,7 +13,7 @@ define(["color", "matrix2d", "node"], function (colorModule, matrix2dModule, nod
 
         this.root = new Node({
             size: [this.width, this.height],
-            color: new Color(0.4, 0.4, 0.4, 1)
+            color: [0.4, 0.4, 0.4, 1]
         });
 
         this.blackBox = new Node({
@@ -23,28 +22,28 @@ define(["color", "matrix2d", "node"], function (colorModule, matrix2dModule, nod
             rotation: 45,
             anchor: [0.5, 0.25],
             skew: [0, 0],
-            color: new Color(0, 0, 0, 1)
+            color: [0, 0, 0, 1]
         });
 
         this.greenDot = new Node({
             anchor: [0.5, 0.5],
             position: [100, 100],
             size: [1, 1],
-            color: new Color(0, 1, 0, 1)
+            color: [0, 1, 0, 1]
         });
 
         this.redDot = new Node({
             position: [0, 0],
             anchor: [0, 0],
             size: [20, 10],
-            color: new Color(1, 0, 0, 1)
+            color: [1, 0, 0, 1]
         });
 
         this.blueDot = new Node({
             position: [30, 50],
             anchor: [1, 1],
             size: [20, 10],
-            color: new Color(0.7, 0.7, 1, 1)
+            color: [0.7, 0.7, 1, 1]
         });
 
         this.blackBox.children = [this.redDot, this.blueDot];

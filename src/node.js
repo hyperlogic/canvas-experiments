@@ -1,6 +1,6 @@
 define(["color", "matrix2d", "objectutil"], function (colorModule, matrix2dModule, objectUtilModule) {
 
-    var Color = colorModule.Color;
+    var Color = colorModule;
     var Matrix2D = matrix2dModule.Matrix2D;
     var ObjectUtil = objectUtilModule;
     var DATA_ATTRS = ["position", "rotation", "scale", "skew", "size", "anchor", "color"];
@@ -13,18 +13,12 @@ define(["color", "matrix2d", "objectutil"], function (colorModule, matrix2dModul
         this._skew = [0, 0];
         this._size = [0, 0];
         this._anchor = [0, 0];
-        this._color = new Color(1, 1, 1, 1);
+        this._color = [1, 1, 1, 1];
         this._children = [];
         this._xformDirty = true;
 
         // set attributes present on data
-        if (data) {
-            for (var i = 0; i < DATA_ATTRS.length; i++) {
-                var value = data[DATA_ATTRS[i]];
-                if (value)
-                    this[DATA_ATTRS[i]] = value;
-            }
-        }
+        ObjectUtil.initAttrsFromData(this, DATA_ATTRS, data);
     };
 
     // xform attributes
@@ -83,8 +77,9 @@ define(["color", "matrix2d", "objectutil"], function (colorModule, matrix2dModul
             xform = this._xform;
         }
         ctx.setTransform.apply(ctx, xform.m);
-        ctx.fillStyle = this.color.toString();
+        ctx.fillStyle = Color.toCssString(this._color);
         ctx.fillRect(0, 0, this._size[0], this._size[1]);
+        ctx.strokeStyle = Color.toCssString([1, 0, 0, 1]);
 
         for (var i = 0; i < this._children.length; i++) {
             this._children[i].draw(ctx, xform);

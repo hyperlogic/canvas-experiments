@@ -31,5 +31,24 @@ define(function () {
         }
     };
 
-    return {attr: attr};
+    /**
+     * Useful within object constructors for initialization, 
+     * Any keys in data which are are also present in attrKeys will be set on obj.
+     *
+     * @param {Object} obj Object to set values upon.
+     * @param {Array} attrKeys Array of string keys to search for in the data obj.
+     * @apram {Object} data Object with values which may or may not be added to obj.
+     */
+    var initAttrsFromData = function (obj, attrKeys, data) {
+        if (data) {
+            for (var i = 0; i < attrKeys.length; i++) {
+                var value = data[attrKeys[i]];
+                if (value)
+                    obj[attrKeys[i]] = value;
+            }
+        }
+    };
+
+    return {attr: attr,
+            initAttrsFromData: initAttrsFromData};
 });

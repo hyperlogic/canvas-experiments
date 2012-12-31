@@ -1,14 +1,15 @@
 define(function () {
-    var Color = function (r, g, b, a) {
-        this.r = (r !== undefined) ? r : 1;
-        this.g = (g !== undefined) ? g : 1;
-        this.b = (b !== undefined) ? b : 1;
-        this.a = (a !== undefined) ? a : 1;
-    };
 
-    Color.prototype.toString = function () {
-        return "rgba(" + [Math.floor(this.r * 255), Math.floor(this.g * 255), Math.floor(this.b * 255), this.a].join(",") + ")";
-    };
+	/**
+	 * Converts a 4 element array [r, g, b, a] to a css string.
+	 * elements are assumed to be in the interval [0, 1].
+	 *
+	 * @param {Array} ary - four element array of Numbers [0, 1].
+	 * @returns {String} css string in the form "rgba(255, 255, 255, 1)"
+	 */
+	var toCssString = function (ary) {
+		return "rgba(" + [Math.floor(ary[0] * 255), Math.floor(ary[1] * 255), Math.floor(ary[2] * 255), ary[3]].join(",") + ")";
+	};
 
-    return {Color: Color};
+    return {toCssString: toCssString};
 });
