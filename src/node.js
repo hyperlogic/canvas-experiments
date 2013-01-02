@@ -6,6 +6,8 @@ define(["color", "matrix2d", "objectutil"], function (colorModule, matrix2dModul
     var DATA_ATTRS = ["position", "rotation", "scale", "skew", "size", "anchor", "color"];
 
     var Node = function (data) {
+        var self = this;
+
         // defaults
         this._position = [0, 0];
         this._rotation = 0;
@@ -19,6 +21,15 @@ define(["color", "matrix2d", "objectutil"], function (colorModule, matrix2dModul
 
         // set attributes present on data
         ObjectUtil.initAttrsFromData(this, DATA_ATTRS, data);
+
+        /*
+        // AJT: REMOVE image test
+        this._imageObj = new Image();
+        this._imageObj.onload = function() {
+            self._imageObjReady = true;
+        };
+        this._imageObj.src = 'img/html5-logo-512.png';
+        */
     };
 
     // xform attributes
@@ -34,35 +45,23 @@ define(["color", "matrix2d", "objectutil"], function (colorModule, matrix2dModul
 
     Node.prototype._updateXform = function () {
         if (this._xformDirty) {
-            var ax = this._anchor[0] * this._size[0];
-            var ay = this._anchor[1] * this._size[1];
+            var ox = this._anchor[0] * this._size[0];
+            var oy = this._anchor[1] * this._size[1];
+            var offsetXform = new Matrix2D(1, 0, 0, 1, -ox, -oy);
             var theta = this._rotation * (Math.PI / 180);
             var sinTheta = Math.sin(theta);
             var cosTheta = Math.cos(theta);
-            var hasSkew = this._skew[0] != 0 || this._skew[1] != 0;
-            var x = this._position[0];
-            var y = this._position[1];
-            if (!hasSkew && (ax != 0 || ay != 0)) {
-                x += (cosTheta * -ax * this._scale[0]) - (sinTheta * -ay * this._scale[1]);
-                y += (sinTheta * -ax * this._scale[0]) + (cosTheta * -ay * this._scale[1]);
-            }
             var trsXform = new Matrix2D(cosTheta * this._scale[0], sinTheta * this._scale[0],
                                         -sinTheta * this._scale[1], cosTheta * this._scale[1],
-                                        x, y);
+                                        this._position[0], this._position[1]);
+            var hasSkew = this._skew[0] != 0 || this._skew[1] != 0;
             if (hasSkew) {
                 var skewXform = new Matrix2D(1, Math.tan(this._skew[1] * (Math.PI / 180)),
-                                             Math.tan(this._skew[0] * (Math.PI / 180)), 1,
-                                             0, 0);
-                var trsSkewXform = Matrix2D.multiply(trsXform, skewXform);
-                if (ax != 0 || ay != 0) {
-                    var offset = new Matrix2D();
-                    offset.setScaleRotTrans(1, 1, 0, -ax, -ay);
-                    this._xform = Matrix2D.multiply(trsSkewXform, offset);
-                } else {
-                    this._xform = trsSkewXform;
-                }
+                                         Math.tan(this._skew[0] * (Math.PI / 180)), 1,
+                                         0, 0);
+                this._xform = Matrix2D.multiply(trsXform, Matrix2D.multiply(skewXform, offsetXform));
             } else {
-                this._xform = trsXform;
+                this._xform = Matrix2D.multiply(trsXform, offsetXform);
             }
             this._xformDirty = false;
         }
@@ -80,6 +79,14 @@ define(["color", "matrix2d", "objectutil"], function (colorModule, matrix2dModul
         ctx.fillStyle = Color.toCssString(this._color);
         ctx.fillRect(0, 0, this._size[0], this._size[1]);
         ctx.strokeStyle = Color.toCssString([1, 0, 0, 1]);
+
+        // AJT: REMOVE image stuff
+        /*
+        if (this._imageObjReady) {
+            ctx.scale(this._size[0] / 512, this._size[1] / 512);
+            ctx.drawImage(this._imageObj, 0, 0);
+        }
+        */
 
         for (var i = 0; i < this._children.length; i++) {
             this._children[i].draw(ctx, xform);

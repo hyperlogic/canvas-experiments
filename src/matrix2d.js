@@ -12,7 +12,7 @@ define(function () {
         if (arguments.length === 6)
             this.m = [a, b, c, d, e, f];
         else
-            this.m = [1, 0, 0, 1, 0, 0];
+            this.m = [1, 0, 0, 1, 0, 0]; // identity
     };
 
     Matrix2D.prototype.setScaleRotTrans = function (sx, sy, rot, tx, ty) {
